@@ -1,12 +1,15 @@
 /** @format */
 import { response } from "express";
 import { useState } from "react";
+import Modal from "./components/Modal";
 
 const App = () => {
   const [images, setImages] = useState(null);
   const [value, setValue] = useState(null);
   const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage]= useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
   const supriseOption = [
     "A red car driving backwards",
     "A blue bike riding on water",
@@ -14,25 +17,26 @@ const App = () => {
     "A yellow boat swimming on land",
   ];
 
-  const uploadImage = async(e) =>{
-    console.log(e.target.files[0])
+  const uploadImage = async (e) => {
+    console.log(e.target.files[0]);
 
-    const formData = new FormData()
-    formData.append('file', e.target.files[0])
-    setSelectedImage(e.target.files[0])
+    const formData = new FormData();
+    formData.append("file", e.target.files[0]);
+    setModalOpen(true);
+    setSelectedImage(e.target.files[0]);
+    e.target.value = null
 
-    try{
-      const options ={
+    try {
+      const options = {
         method: "POST",
-        body: formData
-      }
-      await fetch('http://localhost:8000/upload',options)
-      const data =await response.json()
-      
-    }catch(error){
-      console.error(error)
+        body: formData,
+      };
+      await fetch("http://localhost:8000/upload", options);
+      const data = await response.json();
+    } catch (error) {
+      console.error(error);
     }
-  }
+  };
   const supriseMe = () => {
     setImages(null);
     const randomValue =
@@ -63,7 +67,27 @@ const App = () => {
     }
   };
 
-  console.log(value);
+  const generateVariation = async () => {
+    setImages(null)
+    if (selectedImage === null){
+      setError('Error! must have existing image')
+      setModalOpen(false) 
+      return
+    }   
+    try {
+      const options = {
+        method: "POST",
+      };
+      const response = await fetch("http://localhost:8000/variations", options);
+      const data = await response.json();
+      console.log(data);
+      setImages(data);
+      setError(null);
+      setModalOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <div className="App">
       <section className="search-section">
@@ -85,11 +109,27 @@ const App = () => {
           Or,
           <span>
             <label htmlFor="files"> Upload an image </label>
-            <input onChange={uploadImage} id="files" accept="image/*" type="file" hidden />
+            <input
+              onChange={uploadImage}
+              id="files"
+              accept="image/*"
+              type="file"
+              hidden
+            />
           </span>
           to edit
         </p>
         {error && <p>{error}</p>}
+        {modalOpen && (
+          <div className="overlay">
+            <Modal
+              setModalOpen={setModalOpen}
+              setSelectedImage={setSelectedImage}
+              selectedImage={selectedImage}
+              generateVariation={generateVariation}
+            />
+          </div>
+        )}
       </section>
       <section className="image-section">
         {images?.map((image, _index) => (
