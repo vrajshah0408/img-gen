@@ -1,5 +1,5 @@
 /** @format */
-import { response } from "express";
+
 import { useState } from "react";
 import Modal from "./components/Modal";
 
@@ -24,15 +24,16 @@ const App = () => {
     formData.append("file", e.target.files[0]);
     setModalOpen(true);
     setSelectedImage(e.target.files[0]);
-    e.target.value = null
+    e.target.value = null;
 
     try {
       const options = {
         method: "POST",
         body: formData,
       };
-      await fetch("http://localhost:8000/upload", options);
+      const response = await fetch("http://localhost:8000/upload", options);
       const data = await response.json();
+      console.log(data);
     } catch (error) {
       console.error(error);
     }
@@ -68,12 +69,12 @@ const App = () => {
   };
 
   const generateVariation = async () => {
-    setImages(null)
-    if (selectedImage === null){
-      setError('Error! must have existing image')
-      setModalOpen(false) 
-      return
-    }   
+    setImages(null);
+    if (selectedImage === null) {
+      setError("Error! must have existing image");
+      setModalOpen(false);
+      return;
+    }
     try {
       const options = {
         method: "POST",
@@ -132,13 +133,17 @@ const App = () => {
         )}
       </section>
       <section className="image-section">
-        {images?.map((image, _index) => (
-          <img
-            key={_index}
-            src={image.url}
-            alt={`Generated image of ${value}`}
-          />
-        ))}
+        {images ? (
+          images.map((image, index) => (
+            <img
+              key={index}
+              src={image.url}
+              alt={`Generated pics of ${value}`}
+            />
+          ))
+        ) : (
+          <p>Loading images...</p>
+        )}
       </section>
     </div>
   );

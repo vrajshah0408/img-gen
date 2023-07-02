@@ -20,10 +20,10 @@ const Modal = ({setModalOpen, setSelectedImage, selectedImage, generateVariation
     <div className="modal">
         <div onClick={closeModal}>✘</div>
         <div className="img-container">
-            {selectedImage && <img ref={ref} src={URL.createObjectURL(selectedImage)} alt="uploaded image"/>}
+            {selectedImage && <img ref={ref} src={URL.createObjectURL(selectedImage)} alt="uploaded pic"/>}
         </div>
         <p>{error || "Image must be 256 X 256"} </p>
-        {! error && <button onClick={checkSize}>Generate</button>}
+        {! error && <button onClick={checkSize} >Generate</button>}
         {error && <button onClick={closeModal}>Retry</button>}
         
         
